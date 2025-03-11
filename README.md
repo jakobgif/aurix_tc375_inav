@@ -4,6 +4,8 @@
 # aurix_tc375_inav
 This code implements a ported version of [inav](https://github.com/jakobgif/inav_tc375.git) for the [Aurix TC375 Litekit](). 
 
+Run ```git clone --recurse-submodules "https://github.com/jakobgif/aurix_tc375_inav.git"``` to clone the repo including the submodules.
+
 ## Table of contents
 - [aurix\_tc375\_inav](#aurix_tc375_inav)
   - [Table of contents](#table-of-contents)
