@@ -1,0 +1,3 @@
+[submodule "inav_tc375"]
+	path = inav_tc375
+	url = https://github.com/jakobgif/inav_tc375.git
