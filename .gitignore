@@ -2,6 +2,12 @@
 /TriCore-Debug-(GCC)
 /TriCore Release (GCC)
 /TriCore-Release-(GCC)
+
+/TriCore Debug (TASKING)
+/TriCore-Debug-(TASKING)
+/TriCore Release (TASKING)
+/TriCore-Release-(TASKING)
+
 .ads
 *.launch
 .settings
@@ -64,6 +70,8 @@ dkms.conf
 
 .vscode
 *.code-workspace
+
+version_strings.h
 
 # doxygen output
 doc/*
