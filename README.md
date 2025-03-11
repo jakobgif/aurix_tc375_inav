@@ -2,7 +2,7 @@
 | ----------------- | ----- |
 
 # aurix_tc375_inav
-This code implements [inav](https://github.com/iNavFlight/inav.git) for the [Aurix TC375 Litekit](). 
+This code implements a ported version of [inav](https://github.com/jakobgif/inav_tc375.git) for the [Aurix TC375 Litekit](). 
 
 ## Table of contents
 - [aurix\_tc375\_inav](#aurix_tc375_inav)
@@ -11,6 +11,7 @@ This code implements [inav](https://github.com/iNavFlight/inav.git) for the [Aur
     - [Build options](#build-options)
       - [Release build](#release-build)
       - [Debug build](#debug-build)
+  - [Submodules](#submodules)
   - [Scripts](#scripts)
   
 ## Building
@@ -28,6 +29,13 @@ Do not use the Tasking compiler.
 - Use TriCore Debug (GCC) configuration
 - BUILD_CONFIG_DEBUG is defined via -D command
 - Debug uses optimiation level "Optimize for debug (-Og)"
+
+## Submodules
+This project uses two submodules:
+1. ported inav flight control software
+2. fault injection unit for tc375
+
+The submodules are also listed in [.gitmodules](.gitmodules).
 
 ## Scripts
 [pre_build.bat](pre_build.bat) must be run before building the code. The aurix project is configured to do that.
