@@ -36,7 +36,7 @@ Do **not** use the Tasking compiler.
 #### Release build
 - Use TriCore Release (GCC) configuration
 - BUILD_CONFIG_RELEASE is defined via -D flag
-- Release uses optimisation level "Optimize most (-O3)"
+- Release uses optimisation level "Optimize more (-O2)"
 
 #### Debug build
 - Use TriCore Debug (GCC) configuration
@@ -59,6 +59,7 @@ If vscode is used the following `c_cpp_properties.json` can be used to configure
             "includePath": [
                 "${workspaceFolder}/*",
                 "${workspaceFolder}/Libraries/**", //aurix lib
+                "${workspaceFolder}/configurations/**",
                 //inav lib all
                 //"${workspaceFolder}/inav_tc375/src/main/**",
                 //inav lib with specific target
@@ -80,11 +81,12 @@ If vscode is used the following `c_cpp_properties.json` can be used to configure
                 "${workspaceFolder}/inav_tc375/src/main/scheduler/**",
                 "${workspaceFolder}/inav_tc375/src/main/sensors/**",
                 "${workspaceFolder}/inav_tc375/src/main/startup/**",
+                "${workspaceFolder}/inav_tc375/src/main/target/*",
                 "${workspaceFolder}/inav_tc375/src/main/target/FHTW_TC375_LK/**", //only our target required
                 "${workspaceFolder}/inav_tc375/src/main/telemetry/**"
             ],
             "defines": [
-                "FROM_AURIX_STUDIO"
+                "TC375"
             ],
             "cStandard": "gnu99",
             //"cppStandard": "gnu++17",
