@@ -28,10 +28,9 @@
 #include "IfxCpu.h"
 #include "IfxScuWdt.h"
 
-#include "Bsp.h"
-#include "IfxPort.h"
-
-#define LED_GREEN_1 &MODULE_P00,6
+#include "platform.h"
+#include "drivers/light_led.h"
+#include "log.h"
 
 extern IfxCpu_syncEvent g_cpuSyncEvent;
 
@@ -48,14 +47,14 @@ void core2_main(void)
     IfxCpu_emitEvent(&g_cpuSyncEvent);
     IfxCpu_waitEvent(&g_cpuSyncEvent, 1);
 
-    IfxPort_setPinModeOutput(LED_GREEN_1, IfxPort_OutputMode_pushPull, IfxPort_OutputIdx_general);
-    IfxPort_setPinState(LED_GREEN_1, IfxPort_State_high);
+    init();
+
+    LOG_INFO(SYSTEM, "Hello, World! I am running on Aurix.");
     
-    while(1)
-    {
-        IfxPort_setPinLow(LED_GREEN_1);
-        waitTime(IfxStm_getTicksFromMilliseconds(BSP_DEFAULT_TIMER, 50));
-        IfxPort_setPinHigh(LED_GREEN_1);
-        waitTime(IfxStm_getTicksFromMilliseconds(BSP_DEFAULT_TIMER, 650));
+    while(1){
+        LED0_ON;
+        delay(50);
+        LED0_OFF;
+        delay(650);
     }
 }
