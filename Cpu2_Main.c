@@ -29,7 +29,6 @@
 #include "IfxScuWdt.h"
 
 #include "platform.h"
-#include "drivers/light_led.h"
 #include "log.h"
 
 extern IfxCpu_syncEvent g_cpuSyncEvent;
@@ -50,11 +49,9 @@ void core2_main(void)
     init();
 
     LOG_INFO(SYSTEM, "Hello, World! I am running on Aurix.");
-    
+
+    LOG_INFO(SYSTEM, "Entering into scheduler loop");
     while(1){
-        LED0_ON;
-        delay(50);
-        LED0_OFF;
-        delay(650);
+        scheduler();
     }
 }
