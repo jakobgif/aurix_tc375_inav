@@ -1563,29 +1563,6 @@ SECTIONS
         PROVIDE(__fini_end = .);
         . = ALIGN(8);
     } > pfls0
-
-    .busdev_registry :
-     {
-    	PROVIDE_HIDDEN (__busdev_registry_start = .);
-    	KEEP (*(.busdev_registry))
-    	KEEP (*(SORT(.busdev_registry.*)))
-    	PROVIDE_HIDDEN (__busdev_registry_end = .);
-     } > pfls0
-	
-    .pg_registry :
-    {
-        PROVIDE_HIDDEN (__pg_registry_start = .);
-        KEEP (*(.pg_registry))
-        KEEP (*(SORT(.pg_registry.*)))
-        PROVIDE_HIDDEN (__pg_registry_end = .);
-    } > pfls0
-    
-    .pg_resetdata :
-    {
-        PROVIDE_HIDDEN (__pg_resetdata_start = .);
-        KEEP (*(.pg_resetdata))
-        PROVIDE_HIDDEN (__pg_resetdata_end = .);
-    } > pfls0
     
     /*
      * Code executed before calling main extra section for C++ constructor init
@@ -1650,6 +1627,29 @@ SECTIONS
         *(.cpu2_psram.*)
         . = ALIGN(2);
     } > psram2 AT> pfls1
+
+    .busdev_registry :
+     {
+    	PROVIDE_HIDDEN (__busdev_registry_start = .);
+    	KEEP (*(.busdev_registry))
+    	KEEP (*(SORT(.busdev_registry.*)))
+    	PROVIDE_HIDDEN (__busdev_registry_end = .);
+     } > pfls1
+	
+    .pg_registry :
+    {
+        PROVIDE_HIDDEN (__pg_registry_start = .);
+        KEEP (*(.pg_registry))
+        KEEP (*(SORT(.pg_registry.*)))
+        PROVIDE_HIDDEN (__pg_registry_end = .);
+    } > pfls1
+    
+    .pg_resetdata :
+    {
+        PROVIDE_HIDDEN (__pg_resetdata_start = .);
+        KEEP (*(.pg_resetdata))
+        PROVIDE_HIDDEN (__pg_resetdata_end = .);
+    } > pfls1
 }
 
 /*Code Sections, selectable by toolchain*/
