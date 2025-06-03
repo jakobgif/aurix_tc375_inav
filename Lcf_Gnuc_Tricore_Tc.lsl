@@ -1032,6 +1032,33 @@ REGION_ALIAS( default_ram , dsram2)
         .bmhd_2_copy (0xaf401400) : FLAGS(arl) { KEEP (*(.bmhd_2_copy)); } > ucb
         .bmhd_3_copy (0xaf401600) : FLAGS(arl) { KEEP (*(.bmhd_3_copy)); } > ucb
     }
+
+    CORE_ID = GLOBAL;
+    SECTIONS
+    {
+        .busdev_registry :
+        {
+            PROVIDE_HIDDEN (__busdev_registry_start = .);
+            KEEP (*(.busdev_registry))
+            KEEP (*(SORT(.busdev_registry.*)))
+            PROVIDE_HIDDEN (__busdev_registry_end = .);
+        } > default_rom
+        
+        .pg_registry :
+        {
+            PROVIDE_HIDDEN (__pg_registry_start = .);
+            KEEP (*(.pg_registry))
+            KEEP (*(SORT(.pg_registry.*)))
+            PROVIDE_HIDDEN (__pg_registry_end = .);
+        } > default_rom
+    
+        .pg_resetdata :
+        {
+            PROVIDE_HIDDEN (__pg_resetdata_start = .);
+            KEEP (*(.pg_resetdata))
+            PROVIDE_HIDDEN (__pg_resetdata_end = .);
+        } > default_rom
+    }
     
     /*Near Abbsolute Addressable Data Sections*/
     /*Near Absolute Data, selectable with patterns and user defined sections*/
@@ -1627,29 +1654,6 @@ SECTIONS
         *(.cpu2_psram.*)
         . = ALIGN(2);
     } > psram2 AT> pfls1
-
-    .busdev_registry :
-     {
-    	PROVIDE_HIDDEN (__busdev_registry_start = .);
-    	KEEP (*(.busdev_registry))
-    	KEEP (*(SORT(.busdev_registry.*)))
-    	PROVIDE_HIDDEN (__busdev_registry_end = .);
-     } > pfls1
-	
-    .pg_registry :
-    {
-        PROVIDE_HIDDEN (__pg_registry_start = .);
-        KEEP (*(.pg_registry))
-        KEEP (*(SORT(.pg_registry.*)))
-        PROVIDE_HIDDEN (__pg_registry_end = .);
-    } > pfls1
-    
-    .pg_resetdata :
-    {
-        PROVIDE_HIDDEN (__pg_resetdata_start = .);
-        KEEP (*(.pg_resetdata))
-        PROVIDE_HIDDEN (__pg_resetdata_end = .);
-    } > pfls1
 }
 
 /*Code Sections, selectable by toolchain*/
