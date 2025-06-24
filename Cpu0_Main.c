@@ -31,6 +31,9 @@
 #include "platform.h"
 #include "log.h"
 
+#include "fc/fc_init.h"
+#include "scheduler/scheduler.h"
+
 IfxCpu_syncEvent g_cpuSyncEvent = 0;
 
 void core0_main(void)
