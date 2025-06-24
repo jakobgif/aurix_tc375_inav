@@ -78,7 +78,7 @@ This project uses a ported version of the inav flight control software as a subm
 
 The submodules are also listed in [.gitmodules](.gitmodules).
 
-Please refer to the [inav readme](.gitmodules) for more infos.
+Please refer to the [inav readme](inav_tc375\readme.md) for more infos.
 
 ## VSCode 
 If vscode is used the following `c_cpp_properties.json` can be used to configure the workspace.
