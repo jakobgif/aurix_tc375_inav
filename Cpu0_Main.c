@@ -28,6 +28,9 @@
 #include "IfxCpu.h"
 #include "IfxScuWdt.h"
 
+#include "platform.h"
+#include "log.h"
+
 IfxCpu_syncEvent g_cpuSyncEvent = 0;
 
 void core0_main(void)
@@ -43,9 +46,13 @@ void core0_main(void)
     /* Wait for CPU sync event */
     IfxCpu_emitEvent(&g_cpuSyncEvent);
     IfxCpu_waitEvent(&g_cpuSyncEvent, 1);
-    
-    
-    while(1)
-    {
+
+    init();
+
+    LOG_INFO(SYSTEM, "Hello, World! I am running on Aurix.");
+
+    LOG_INFO(SYSTEM, "Entering into scheduler loop");
+    while(1){
+        scheduler();
     }
 }

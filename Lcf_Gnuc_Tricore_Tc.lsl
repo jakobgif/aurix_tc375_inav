@@ -130,6 +130,16 @@ MEMORY
     
 }
 
+/* Highest address of the user mode stack */
+_estack = ORIGIN(dsram0) + LENGTH(dsram0);    /* end of RAM */
+
+/* Generate a link error if heap and stack don't fit into RAM */
+_Min_Heap_Size = 0;      /* required amount of heap  */
+_Min_Stack_Size = 0x800; /* required amount of stack */
+
+__config_start = 0xaf000000;
+__config_end = 0xaf03ffff;
+
 /* map local memory address to a global address */
 REGION_MAP( CPU0 , ORIGIN(dsram0_local), LENGTH(dsram0_local), ORIGIN(dsram0))
 REGION_MAP( CPU1 , ORIGIN(dsram1_local), LENGTH(dsram1_local), ORIGIN(dsram1))
@@ -1021,6 +1031,33 @@ REGION_ALIAS( default_ram , dsram2)
         .bmhd_1_copy (0xaf401200) : FLAGS(arl) { KEEP (*(.bmhd_1_copy)); } > ucb
         .bmhd_2_copy (0xaf401400) : FLAGS(arl) { KEEP (*(.bmhd_2_copy)); } > ucb
         .bmhd_3_copy (0xaf401600) : FLAGS(arl) { KEEP (*(.bmhd_3_copy)); } > ucb
+    }
+
+    CORE_ID = GLOBAL;
+    SECTIONS
+    {
+        .busdev_registry :
+        {
+            PROVIDE_HIDDEN (__busdev_registry_start = .);
+            KEEP (*(.busdev_registry))
+            KEEP (*(SORT(.busdev_registry.*)))
+            PROVIDE_HIDDEN (__busdev_registry_end = .);
+        } > default_rom
+        
+        .pg_registry :
+        {
+            PROVIDE_HIDDEN (__pg_registry_start = .);
+            KEEP (*(.pg_registry))
+            KEEP (*(SORT(.pg_registry.*)))
+            PROVIDE_HIDDEN (__pg_registry_end = .);
+        } > default_rom
+    
+        .pg_resetdata :
+        {
+            PROVIDE_HIDDEN (__pg_resetdata_start = .);
+            KEEP (*(.pg_resetdata))
+            PROVIDE_HIDDEN (__pg_resetdata_end = .);
+        } > default_rom
     }
     
     /*Near Abbsolute Addressable Data Sections*/
