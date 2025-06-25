@@ -34,7 +34,56 @@
 #include "fc/fc_init.h"
 #include "scheduler/scheduler.h"
 
+#include "IfxDma_Dma.h"
+#include "IfxDma.h"
+
 IfxCpu_syncEvent g_cpuSyncEvent = 0;
+
+uint8_t dmaArray[] = "Hello, World! This data was send using DMA!";
+uint8_t dmaTargetArray[100];
+
+#define DMA_CHANNEL_ID      IfxDma_ChannelId_0     /* DMA Channel Id used to transfer data              */
+
+IfxDma_Dma                dmaHandle;                         /* Module handle to HW module SFR set              */
+IfxDma_Dma_Config         dmaConfig;                         /* Module configuration structure                  */
+IfxDma_Dma_ChannelConfig  dmaChNCfg;                         /* DMA whole channel configurations                */
+IfxDma_Dma_Channel        dmaChannel;                        /* DMA channel configuration set                   */
+
+static void initDma(void){
+    /* Load default module configuration into configuration structure */
+    IfxDma_Dma_initModuleConfig(&dmaConfig, &MODULE_DMA);
+
+    /* Initialize module with configuration. */
+    IfxDma_Dma_initModule(&dmaHandle, &dmaConfig);
+
+    /* Get/initialize DMA channel configuration for all DMA channels otherwise use &g_Dma.dmaChannel as target */
+    IfxDma_Dma_initChannelConfig(&dmaChNCfg, &dmaHandle);
+
+    /* Set desired DMA channel: Channel 0 is used */
+    dmaChNCfg.channelId = DMA_CHANNEL_ID;
+
+    /* Setup the operation mode/settings for DMA channel */
+    dmaChNCfg.moveSize = IfxDma_ChannelMoveSize_8bit;
+    /* Set the number of DMA transfers */
+    dmaChNCfg.transferCount = sizeof(dmaArray);
+
+    /* Execute the DMA transaction with only one trigger */
+    dmaChNCfg.requestMode = IfxDma_ChannelRequestMode_completeTransactionPerRequest;
+
+    /* Setup the specific DMA channel configuration */
+    IfxDma_Dma_initChannel(&dmaChannel, &dmaChNCfg);
+}
+
+/* Trigger a DMA transaction via SW request */
+static void triggerDMATransfer(void){
+    /* Set destination and source address data to DMA channel */
+    dmaChNCfg.sourceAddress      = (uint32_t)&dmaArray[0];
+    dmaChNCfg.destinationAddress = (uint32_t)&dmaTargetArray[0];
+    IfxDma_Dma_initChannel(&dmaChannel, &dmaChNCfg);
+
+    /* Request start of DMA Transaction channel 0 */
+    IfxDma_Dma_startChannelTransaction(&dmaChannel);
+}
 
 void core0_main(void)
 {
@@ -51,10 +100,25 @@ void core0_main(void)
     IfxCpu_waitEvent(&g_cpuSyncEvent, 1);
 
     init();
+    initDma();
 
     LOG_INFO(SYSTEM, "Hello, World! I am running on Aurix.");
 
     LOG_INFO(SYSTEM, "Entering into scheduler loop");
+
+    //copy data
+    triggerDMATransfer();
+
+    //wait until complete
+    while(IfxDma_Dma_isChannelTransactionPending(&dmaChannel) == true);
+
+    if(strncmp(&dmaArray[0], &dmaTargetArray[0], sizeof(dmaArray)) == 0){
+        LOG_INFO(SYSTEM, "DMA worked.");
+    }
+    else{
+        LOG_ERROR(SYSTEM, "DMA Fail!");
+    }
+
     while(1){
         scheduler();
     }
