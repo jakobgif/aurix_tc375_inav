@@ -119,7 +119,6 @@ If vscode is used the following `c_cpp_properties.json` can be used to configure
             ],
             "defines": [
                 "TC375",
-                "__VERSION__=0",
                 "__TRICORE__"
             ],
             "cStandard": "gnu99",
@@ -133,6 +132,8 @@ If vscode is used the following `c_cpp_properties.json` can be used to configure
 
 ## Scripts
 [pre_build.bat](pre_build.bat) must be run before building the code. The aurix project is configured to do that.
+
+[post_build.bat](post_build.bat) must be run after building the code. The aurix project is configured to do that.
 
 [create_version_strings.sh](create_version_strings.sh) generates a header file containing the version information. This includes current git hash and tag. This script is called by [pre_build.bat](pre_build.bat).
 
