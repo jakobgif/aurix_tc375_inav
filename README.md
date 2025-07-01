@@ -90,6 +90,8 @@ If vscode is used the following `c_cpp_properties.json` can be used to configure
             "name": "Aurix",
             "includePath": [
                 "${workspaceFolder}/*",
+                "${workspaceFolder}/TriCore Debug (GCC)/*", //build folder for auto generated files
+                "${workspaceFolder}/TriCore Release (GCC)/*", //build folder for auto generated files
                 "${workspaceFolder}/Libraries/**", //aurix lib
                 "${workspaceFolder}/configurations/**",
                 //inav lib all
