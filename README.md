@@ -22,6 +22,8 @@ Run `git clone --recurse-submodules "https://github.com/jakobgif/aurix_tc375_ina
 ## Building
 Currently the build process is performed inside of Aurix development studio. This project has two build configurations; Debug and Release.
 
+A step by step guide on how to build the application can be found here: [How_to_build.md](How_to_build.md)
+
 ### Build Macros
 The required macros are documented in the inav readme.
 - `TC375` to build for aurix tc375
