@@ -1,6 +1,3 @@
-| Supported Targets | TC375 Litekit |
-| ----------------- | -------------- |
-
 # How to build the project
 This guide describes the steps required to build the INAV firmware for the Aurix TC375 platform.
 It also explains how to switch targets for different microcontrollers and how to include or exclude specific parts of the firmware.
@@ -9,6 +6,8 @@ Building the project requires both the Eclipse-based Aurix Development Studio an
 Since the project depends on generated settings, a script must be executed in the terminal to create these files.
 After the settings have been generated, the project must be built before it can be flashed onto the microcontroller.
 
+It is also possible to build a release with pre generated settings and version strings. This procedure is described here [Build .zip release](#build-zip-release)
+
 ## Table of contents
 - [How to build the project](#how-to-build-the-project)
   - [Table of contents](#table-of-contents)
@@ -16,6 +15,7 @@ After the settings have been generated, the project must be built before it can 
   - [Generate settings in the GCC output folder](#generate-settings-in-the-gcc-output-folder)
   - [Build and falshing the project](#build-and-falshing-the-project)
   - [Build target selection](#build-target-selection)
+  - [Build .zip release](#build-zip-release)
 ---
 
 ## Setting up the IDE for the build
@@ -134,3 +134,13 @@ Adjust these filters according to your needs.
 <div align="center">
 <img src="images\aurix_target_selection.png" alt="aurix_target_selection" width="800"/>
 </div> 
+
+## Build .zip release
+Note: It is not recomended to use this approach for development.
+
+To build a firmware release with pre generated settings and version strings follow this procedure:
+- Import the project as described in [Setting up the IDE for the build](#setting-up-the-ide-for-the-build)
+- copy `settings_generated.c and settings_generated.h` into the build folder.
+- copy `version_strings.h` into the build folder.
+- comment out line 11 of `pre_build.bat` (`..\inav_tc375\src\utils\aurix_generate_version_strings.sh`)
+- comment out line 5 of `post_build.bat` (`del version_strings.h`)
