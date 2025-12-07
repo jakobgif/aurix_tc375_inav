@@ -74,12 +74,6 @@ To **install Git** you can either go to the offical website and download and exe
 
 **Git install**: https://git-scm.com/install/windows
 
-or use the following command for the Windows Powershell. **Notice**: you need to install `winget tool` for the command.
-
-```bash
-winget install --id Git.Git -e --source winget
-```
-
 You can **install WSL** via the Windows Terminal, PowerShell or CMD with the following command:
 
 ```bash
