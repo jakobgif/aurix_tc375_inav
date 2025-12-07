@@ -67,8 +67,18 @@ The build will not complete successfully at this stage, as some additional setti
 ---
 
 ## Generate settings in the GCC output folder
-To generate the required setting files, the **project relies on** the software **Ruby**.  
-The settings script uses Ruby-based tooling to generate the output in the GCC output folder. The Ruby software itself is to be run inside a **Linux-like environment**, therefore on Windows , **WSL**( Windows Subsystem for Linux) is **required**. 
+To generate the required setting files, the **project relies on** the software **Ruby** and **Git-Bash** from **Git**.  
+The settings script uses Ruby-based tooling to generate the output in the GCC output folder. The Ruby software itself is to be run inside a **Linux-like environment**, therefore on Windows , **WSL** ( Windows Subsystem for Linux) is **required**. To **execute the script** (.sh file) on Windows, we use **Git-Bash**. 
+
+To **install Git** you can either go to the offical website and download and execute the setup sotware
+
+**Git install**: https://git-scm.com/install/windows
+
+or use the following command for the Windows Powershell. **Notice**: you need to install `winget tool` for the command.
+
+```bash
+winget install --id Git.Git -e --source winget
+```
 
 You can **install WSL** via the Windows Terminal, PowerShell or CMD with the following command:
 
