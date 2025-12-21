@@ -12,6 +12,7 @@ It is also possible to build a release with pre generated settings and version s
 - [How to build the project](#how-to-build-the-project)
   - [Table of contents](#table-of-contents)
   - [Setting up the IDE for the build](#setting-up-the-ide-for-the-build)
+  - [WSL Setup](#wsl-setup)
   - [Generate settings in the GCC output folder](#generate-settings-in-the-gcc-output-folder)
   - [Build and falshing the project](#build-and-falshing-the-project)
   - [Build target selection](#build-target-selection)
@@ -30,6 +31,8 @@ For the build process the IDE **Aurix Development Studio** form Infineon Technol
 After the start of the IDE, select the workspace where the project resides.
 The workspace should contain the `aurix_tc375_inav` folder, that was cloned via `git clone --recurse-submodules "https://github.com/jakobgif/aurix_tc375_inav.git"` mentioned in the [README.md](README.md). 
 
+Excecute the command `git fetch --tags` in a terminal openened in the cloned repository to fetch all version tags from the remote repo. Run `git tag` to list all available version tags. Excecute `git checkout 1.0.0` to checkout a specific tag (in this case 1.0.0). Afterwards run `git submodule update --init --recursive` to update the submodules based on the tag.
+
 Once the workspace has been set up, the actual project needs to be imported into it.
 To do this, go to **File → Import**. In the import window, select **General → Projects from Folder or Archive** and click next. On the next page, select the import directory where the git repository resides. The window should refresh automatically and detect the project. Mark the project for import and you can click finish.
 
@@ -45,10 +48,7 @@ After that, the project should appear in the IDE on the left-hand side.
 Right-click the project folder and select **Set Active Project**.
 This tells the IDE which project should be built, and the project folder should now appear in bold, indicating that it is active.
 
-**Notice**: Once the project is set as active, a compiler toolchain is assigned to it.
-**Do not use** the **TASKING** compiler. The project must be built using the TriCore GCC toolchain, which automatically applies the required dialect flag `-std=gnu11`.
-
-To change the compiler, right-click the project folder and navigate to Build Configuration → Set Active, and **use** one of the **TriCore (GCC)** configurations.
+To set the compile option, right-click the project folder and navigate to Build Configuration → Set Active, and **use** one of the **TriCore (GCC)** configurations.
 
 This project provides at two build configurations and is defined in [README.md](README.md) :
 - **Debug**
@@ -57,22 +57,16 @@ This project provides at two build configurations and is defined in [README.md](
 To start building the project in the IDE, click the Build icon (the hammer symbol) in the toolbar.
 To perform a rebuild, use the button next to it.
 
-Once the build process starts, the IDE will compile the project and create a folder named `TriCore Debug (GCC)` or `TriCore Release (GCC)`, depending on the selected configuration.
+If you are building the application for the first time make sure to build in the `TriCore Release (GCC)` configuration. 
+Once the build process starts, the IDE will compile the project and create the folders named `TriCore Debug (GCC)` and `TriCore Release (GCC)`.
 The build will not complete successfully at this stage, as some additional settings still need to be generated. These folders are required for creating the generated settings used in the next section.
 
 <div align="center">
 <img src="images\aurix_build.png" alt="aurix_build" width="600"/>
 </div> 
 
----
-
-## Generate settings in the GCC output folder
-To generate the required setting files, the **project relies on** the software **Ruby** and **Git-Bash** from **Git**.  
-The settings script uses Ruby-based tooling to generate the output in the GCC output folder. The Ruby software itself is to be run inside a **Linux-like environment**, therefore on Windows , **WSL** ( Windows Subsystem for Linux) is **required**. To **execute the script** (.sh file) on Windows, we use **Git-Bash**. 
-
-To **install Git** you can either go to the offical website and download and execute the setup sotware
-
-**Git install**: https://git-scm.com/install/windows
+## WSL Setup
+Windows Subsystem for Linux (WSL), is a Microsoft feature allowing developers to run a full Linux environment (like Ubuntu, Debian) directly on Windows, enabling Linux command-line tools. WSL is required to run some of the INAV build tools that this project relies on.
 
 You can **install WSL** via the Windows Terminal, PowerShell or CMD with the following command:
 
@@ -80,38 +74,51 @@ You can **install WSL** via the Windows Terminal, PowerShell or CMD with the fol
 wsl --install
 ```
 
-Afterwords the installation open WSL and run the following commands to install Ruby inside WSL.
+After WSL is installed it can be started in any terminal by running the command `wsl`.
+
+Now some dependencies have to be installed. Run the following commands in the wsl terminal.
+
+Update the repo packages:
+-  `sudo apt update`
+
+Install Git, Make, gcc and Ruby
+-  `sudo apt-get install git make cmake ruby g++`
+
+Install python and python-yaml to allow updates to settings.md
+-  `sudo apt-get install python3`
+
+## Generate settings in the GCC output folder
+To generate the required setting files, the **project relies on** **Git-Bash** from **Git**. Git-Bash is used to simulate a environment in which bash script can run under windows.
+
+To **install Git** you can either go to the offical website and download and execute the setup sotware
+
+**Git install**: https://git-scm.com/install/windows
+
+When installing git-bash, make sure that .sh files are automatically run with git-bash.
+
+The settings generation script uses Ruby-based tooling to generate the output in the GCC output folder. To generate the settings open a windows terminal and navigate into the `aurix_tc375_inav` project directory. 
+
+**Notice**: Depending on the IDE version and the installation path of the IDE, the script may require minor modifications to function correctly.
+Navigate from the `aurix_tc375_inav` directory to `inav_tc375/src/utils` and open the file `aurix_generate_settings.sh`.
+In this file, line 18 contains the apth to the aurix platform includes. **Update this path according to your installed IDE version and installation path**. This path directs the script to the Aurix Platform Libraries inside the Tricore GCC toolchain. If this path does not match, the settings generation will fail.
 
 ```bash
-sudo apt update
-sudo apt install ruby
+export CFLAGS="$INCLUDES -I/mnt/c/Infineon/AURIX-Studio-1.10.2/tools/Compilers/tricore-gcc11/tricore-elf/include $DEFS"
 ```
 
-After Ruby has been installed on to the system, open a terminal and navigate into the `aurix_tc375_inav` porject directory. In that directory execute the following command to execute the settings generation script:
+Execute the following command in the `aurix_tc375_inav` project directory directory to run the settings generation script:
 
 ```bash
 ./generate_settings.bat
 ```
 
-The generation of the settings **may take a couple of minutes**, depending on the system. Once the script is finished, the ouput `done` should appear in the termnial. While the settings are being generated, the following output should appear:
+The generation of the settings **may take a couple of minutes**, depending on the system. Once the script is finished, the ouput `done` should appear in the terminal. While the settings are being generated, the following output should appear:
 
 ```bash
 creating include paths
 running settings.rb
 ruby: warning: shebang line ending with \r may cause problems
 ```
-
-**Notice**: Depending on the IDE version and the installation path of the IDE, the script may require minor modifications to function correctly.
-Navigate from the `aurix_tc375_inav` directory to `inav_tc375/src/utils` and open the file `aurix_generate_settings.sh`.
-In this file, line 18 should contain the following:
-
-```bash
-export CFLAGS="$INCLUDES -I/mnt/c/Infineon/AURIX-Studio-1.10.2/tools/Compilers/tricore-gcc11/tricore-elf/include $DEFS"
-```
-
-**Update this path according to your installed IDE version and installation path**. This path directs the script to the Aurix Platform Libraries inside the Tricore GCC toolchain. If this path does not match, the settings generation will fail.
-
----
 
 ## Build and falshing the project
 After the settings have been generated in the GCC output folder, the **project needs to be built again** inside the IDE.
