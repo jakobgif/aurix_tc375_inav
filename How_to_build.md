@@ -31,7 +31,7 @@ For the build process the IDE **Aurix Development Studio** form Infineon Technol
 After the start of the IDE, select the workspace where the project resides.
 The workspace should contain the `aurix_tc375_inav` folder, that was cloned via `git clone --recurse-submodules "https://github.com/jakobgif/aurix_tc375_inav.git"` mentioned in the [README.md](README.md). 
 
-Excecute the command `git fetch --tags` in a terminal openened in the cloned repository to fetch all version tags from the remote repo. Run `git tag` to list all available version tags. Excecute `git checkout 1.0.0` to checkout a specific tag (in this case 1.0.0). Afterwards run `git submodule update --init --recursive` to update the submodules based on the tag.
+Excecute the command `git fetch --tags` in a terminal openened in the cloned repository to fetch all version tags from the remote repo. Run `git tag` to list all available version tags. Excecute `git checkout 1.0.0` to checkout a specific tag (in this case 1.0.0). Afterwards run `git submodule update --init --recursive` to update the submodules based on the tag. To find information about specific tags visit [Releases](https://github.com/jakobgif/aurix_tc375_inav/releases).
 
 Once the workspace has been set up, the actual project needs to be imported into it.
 To do this, go to **File → Import**. In the import window, select **General → Projects from Folder or Archive** and click next. On the next page, select the import directory where the git repository resides. The window should refresh automatically and detect the project. Mark the project for import and you can click finish.
