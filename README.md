@@ -24,6 +24,8 @@ Currently the build process is performed inside of Aurix development studio. Thi
 
 A step by step guide on how to build the application can be found here: [How_to_build.md](How_to_build.md)
 
+**Want to contribute?** Just open an [issue](https://github.com/jakobgif/aurix_tc375_inav/issues) and we will get back to you.
+
 ### Build Macros
 The required macros are documented in the inav readme.
 - `TC375` to build for aurix tc375
