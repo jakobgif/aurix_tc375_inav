@@ -10,7 +10,7 @@
 
 .ads
 *.launch
-.settings
+.settings/*
 
 # ude report files
 __connection_failed_report*
@@ -84,3 +84,6 @@ libclang.dll
 
 temp/*
 *.zip
+
+# allow .settings/com.infineon.aurix.buildsystem.prefs
+!/.settings/com.infineon.aurix.buildsystem.prefs
