@@ -84,8 +84,7 @@ Update the repo packages:
 Install Git, Make, gcc and Ruby
 -  `sudo apt-get install git make cmake ruby g++`
 
-Install python and python-yaml to allow updates to settings.md
--  `sudo apt-get install python3`
+After the installation is complete you can exit the wsl by just closing the terminal.
 
 ## Generate settings in the GCC output folder
 To generate the required setting files, the **project relies on** **Git-Bash** from **Git**. Git-Bash is used to simulate a environment in which bash script can run under windows.
