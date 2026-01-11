@@ -98,8 +98,6 @@ If vscode is used the following `c_cpp_properties.json` can be used to configure
                 "${workspaceFolder}/TriCore Release (GCC)/*", //build folder for auto generated files
                 "${workspaceFolder}/Libraries/**", //aurix lib
                 "${workspaceFolder}/configurations/**",
-                //inav lib all
-                //"${workspaceFolder}/inav_tc375/src/main/**",
                 //inav lib with specific target
                 "${workspaceFolder}/inav_tc375/src/main/*",
                 "${workspaceFolder}/inav_tc375/src/main/blackbox/**",
@@ -120,12 +118,17 @@ If vscode is used the following `c_cpp_properties.json` can be used to configure
                 "${workspaceFolder}/inav_tc375/src/main/sensors/**",
                 "${workspaceFolder}/inav_tc375/src/main/startup/**",
                 "${workspaceFolder}/inav_tc375/src/main/target/*",
-                "${workspaceFolder}/inav_tc375/src/main/target/FHTW_TC375_LK/**", //only our target required
-                "${workspaceFolder}/inav_tc375/src/main/telemetry/**"
+                "${workspaceFolder}/inav_tc375/src/main/target/UASTW_TC375_LK_COMET/**", //only our target required
+                "${workspaceFolder}/inav_tc375/src/main/telemetry/**",
+                "${workspaceFolder}/inav_tc375/lib/main/kissfft/**",
+                "C:/Infineon/AURIX-Studio-1.10.28/tools/Compilers/tricore-gcc11/tricore-elf/include"
             ],
             "defines": [
                 "TC375",
-                "__TRICORE__"
+                "__TRICORE__",
+                "__GCC__=11",
+                "__GCC_MINOR__=3",
+                "__GCC_PATCHLEVEL__=1"
             ],
             "cStandard": "gnu99",
             "cppStandard": "gnu++17",
