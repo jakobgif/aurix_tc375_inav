@@ -124,6 +124,8 @@ After the settings have been generated in the GCC output folder, the **project n
 This time, the build process should complete successfully, although a few minor warnings may appear.
 Once the build has finished, the INAV firmware can be flashed onto the microcontroller.
 
+Note: Sometimes the configuration storage of the MCU has to be cleared. Especially when upgrading the major inav version. To clear the config storage on startup define `AURIX_CLEAR_DFLASH_ON_SYSTEM_INIT` in `platform.h` before building the firmware. After the first time the firmware has been flashed the flag can be removed and the firmware can be flashed again.
+
 The **flash button** is the **orange circular symbol** in the IDE toolbar, as shown in the following picture:
 <div align="center">
 <img src="images\aurix_flash.png" alt="aurix_flash" width="600"/>
