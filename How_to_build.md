@@ -16,6 +16,7 @@ It is also possible to build a release with pre generated settings and version s
   - [Generate settings in the GCC output folder](#generate-settings-in-the-gcc-output-folder)
   - [Build and falshing the project](#build-and-falshing-the-project)
   - [Build target selection](#build-target-selection)
+  - [Build multicore application](#build-multicore-application)
   - [Build .zip release](#build-zip-release)
 ---
 
@@ -145,6 +146,17 @@ Adjust these filters according to your needs.
 
 <div align="center">
 <img src="images\aurix_target_selection.png" alt="aurix_target_selection" width="800"/>
+</div> 
+
+Note that this setting has to manually be applied to both build configurations (Release and Debug).
+
+## Build multicore application
+To build the multicore version of INAV, the compile time macro `USE_AURIX_MULTICORE` has to be set. This can be done by modifying the project build configurations.
+
+To add compile time defines, right-click the project folder and select **Properties**. Then navigate to **C/C++ Build → Settings → AURIX GCC Compiler → Preprocessor**. Add a new entry to define `USE_AURIX_MULTICORE`.
+
+<div align="center">
+<img src="images\aurix_defines.png" alt="aurix_defines" width="800"/>
 </div> 
 
 ## Build .zip release
