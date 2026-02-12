@@ -1566,6 +1566,7 @@ SECTIONS
         *Cpu0_Main.*(.text.*)
         *(.text_cpu0)
         *(.text_cpu0.*)
+        . = ALIGN(8);
     } > pfls0
     
     /*
@@ -1618,6 +1619,7 @@ SECTIONS
         *Cpu1_Main.*(.text.*)
         *(.text_cpu1)
         *(.text_cpu1.*)
+        . = ALIGN(8);
     } > pfls1
 
     CORE_SEC(.psram_text)  : FLAGS(awx)
@@ -1643,6 +1645,7 @@ SECTIONS
         *Cpu2_Main.*(.text.*)
         *(.text_cpu2)
         *(.text_cpu2.*)
+        . = ALIGN(8);
     } > pfls1
 
     CORE_SEC(.psram_text)  : FLAGS(awx)
