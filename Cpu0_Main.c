@@ -36,6 +36,12 @@
 
 IfxCpu_syncEvent g_cpuSyncEvent = 0;
 
+//only sync between core0 and core1
+IfxCpu_syncEvent g_inavInitComplete = 0b100;
+
+//indicates if a cpu core is used or not
+bool g_cpuIsUsed[sizeof(IfxCpu_ResourceCpu)-1];
+
 void core0_main(void)
 {
     IfxCpu_enableInterrupts();
@@ -51,6 +57,10 @@ void core0_main(void)
     IfxCpu_waitEvent(&g_cpuSyncEvent, 1);
 
     init();
+
+    g_cpuIsUsed[IfxCpu_getCoreIndex()] = true;
+
+    IfxCpu_emitEvent(&g_inavInitComplete);
 
     LOG_INFO(SYSTEM, "Hello, World! I am running on Aurix.");
 
