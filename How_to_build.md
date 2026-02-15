@@ -17,6 +17,7 @@ It is also possible to build a release with pre generated settings and version s
   - [Build and falshing the project](#build-and-falshing-the-project)
   - [Build target selection](#build-target-selection)
   - [Build multicore application](#build-multicore-application)
+  - [Build with Fault Insertion Unit (FIU)](#build-with-fault-insertion-unit-fiu)
   - [Build .zip release](#build-zip-release)
 ---
 
@@ -158,6 +159,13 @@ To add compile time defines, right-click the project folder and select **Propert
 <div align="center">
 <img src="images\aurix_defines.png" alt="aurix_defines" width="800"/>
 </div> 
+
+## Build with Fault Insertion Unit (FIU)
+To build the firmware with the Fault Insertion Unit (FIU) enabled, the compile time macro `USE_FIU` has to be set. This can be done by modifying the project build configurations, the same way as described in the [Build multicore application](#build-multicore-application) section.
+
+To add compile time defines, right-click the project folder and select **Properties**. Then navigate to **C/C++ Build → Settings → AURIX GCC Compiler → Preprocessor**. Add a new entry to define `USE_FIU`.
+
+For more information on what the FIU module does, see the [FIU README](inav_tc375/src/main/fiu/README.md).
 
 ## Build .zip release
 Note: It is not recomended to use this approach for development.
