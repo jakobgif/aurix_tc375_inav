@@ -28,7 +28,19 @@
 #include "IfxCpu.h"
 #include "IfxScuWdt.h"
 
+#include "platform.h"
+
+#include "drivers/time.h"
+#include "drivers/bus_spi.h"
+#include "sensors/gyro.h"
+#include "sensors/acceleration.h"
+
+#include "common/log.h"
+#include "config.h"
+
 extern IfxCpu_syncEvent g_cpuSyncEvent;
+extern IfxCpu_syncEvent g_inavInitComplete;
+extern bool g_cpuIsUsed[];
 
 void core1_main(void)
 {
@@ -43,7 +55,34 @@ void core1_main(void)
     IfxCpu_emitEvent(&g_cpuSyncEvent);
     IfxCpu_waitEvent(&g_cpuSyncEvent, 1);
     
+#ifdef USE_AURIX_MULTICORE
+    //wait until inav init is complete
+    IfxCpu_emitEvent(&g_inavInitComplete);
+    IfxCpu_waitEvent(&g_inavInitComplete, UINT32_MAX);
+
+    LOG_INFO(SYSTEM, "CPU1 is alive!");
+    g_cpuIsUsed[IfxCpu_getCoreIndex()] = true;
+
+    //change the ISR provider of the SPI bus to CPU1
+    spiSetHandlingCpu(CPU1_SPI_BUS, IfxCpu_getCoreIndex());
+
+    timeUs_t lastUpdate = 0;
+    timeUs_t diff = 0;
+    
+    while(true) {
+        lastUpdate = micros();
+        
+        if(!gyroUpdate());
+        if(!accUpdate());
+
+        diff = micros()-lastUpdate;
+        if(diff < TASK_GYRO_LOOPTIME){
+            delayMicroseconds(TASK_GYRO_LOOPTIME-diff);
+        }
+    }
+#else
     while(1)
     {
     }
+#endif
 }
