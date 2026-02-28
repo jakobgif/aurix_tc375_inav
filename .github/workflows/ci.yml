@@ -1,0 +1,165 @@
+name: Build Aurix TC375 INAV Firmware
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        include:
+          - define: ""
+            artifact: aurix-tc375-inav
+          - define: USE_AURIX_MULTICORE
+            artifact: aurix-tc375-inav-multicore
+          - define: USE_FIU
+            artifact: aurix-tc375-inav-fiu
+
+    steps:
+      # Checkout the CI action repo so we know the bundled toolchain path
+      - name: Checkout aurix_tc375_ci (for toolchain)
+        uses: actions/checkout@v4
+        with:
+          repository: jakobgif/aurix_tc375_ci
+          path: aurix_tc375_ci
+
+      # Clone the firmware repo with all submodules and fetch version tags
+      - name: Clone aurix_tc375_inav with submodules
+        shell: bash
+        run: |
+          git clone --recurse-submodules https://github.com/jakobgif/aurix_tc375_inav.git firmware
+
+      # First makefile pass — parses .cproject before settings files exist
+      - name: Generate Makefile (first pass)
+        id: gen_makefile_1
+        uses: jakobgif/aurix_tc375_ci@main
+        with:
+          project-path: firmware
+          configuration: TriCore Release (GCC)
+          extra-defines: ${{ matrix.define }}
+
+      # Generate version_strings.h from git tags (equivalent to pre_build.bat).
+      # Run from inside the build directory so the file lands there directly.
+      - name: Generate version strings
+        shell: bash
+        run: |
+          WS=$(cygpath -u "$GITHUB_WORKSPACE")
+          cd "${WS}/firmware/TriCore Release (GCC)"
+          bash ../inav_tc375/src/utils/aurix_generate_version_strings.sh
+
+      # Generate settings
+      - name: Create junction for settings generation
+        shell: pwsh
+        run: |
+          New-Item -ItemType Junction `
+            -Path "${{ github.workspace }}\firmware\rel" `
+            -Target "${{ github.workspace }}\firmware\TriCore Release (GCC)"
+
+      - name: Generate INAV settings
+        shell: bash
+        run: |
+          WS=$(cygpath -u "$GITHUB_WORKSPACE")
+          TRICORE_BIN="${WS}/aurix_tc375_ci/toolchain/tricore-gcc11/bin"
+          SETTINGS_SH="${WS}/firmware/inav_tc375/src/utils/aurix_generate_settings.sh"
+
+          sed -i "s| -I/mnt/c/Infineon/AURIX-Studio-1.10.2/tools/Compilers/tricore-gcc11/tricore-elf/include||" \
+              "${SETTINGS_SH}"
+          sed -i "19s|.*|export CPP_PATH='${TRICORE_BIN}'; export SETTINGS_CXX='tricore-elf-g++'|" \
+              "${SETTINGS_SH}"
+
+          cd "${WS}/firmware/rel"
+          bash "${SETTINGS_SH}"
+
+      - name: Remove settings junction
+        shell: pwsh
+        run: |
+          Remove-Item -Path "${{ github.workspace }}\firmware\rel" -Force
+
+      # Second makefile pass — now that settings_generated.c/.h exist in the
+      # build folder, regenerate so the makefile picks them up correctly
+      - name: Generate Makefile (final pass)
+        id: gen_makefile_2
+        uses: jakobgif/aurix_tc375_ci@main
+        with:
+          project-path: firmware
+          configuration: TriCore Release (GCC)
+          extra-defines: ${{ matrix.define }}
+
+      # settings_generated.c is #include'd directly by settings.c — it must NOT
+      # be a separate compilation unit. generate_makefiles.py adds it to sources
+      # because it finds the .c file in the build folder. Remove that entry from
+      # the generated makefile before building to prevent duplicate symbols.
+      - name: Remove settings_generated.c from makefile sources
+        shell: bash
+        run: |
+          MAKEFILE=$(cygpath -u "${{ steps.gen_makefile_2.outputs.makefile-path }}")
+          MAKEFILE_DIR=$(dirname "$MAKEFILE")
+          # Remove settings_generated from the makefile (OBJS + sources)
+          sed -i '/settings_generated/d' "$MAKEFILE"
+          # generate_makefiles.py also writes .opt response files for the linker;
+          # strip settings_generated.o from those too.
+          find "$MAKEFILE_DIR" -name "*.opt" -exec sed -i '/settings_generated/d' {} \;
+
+      # Build the release firmware
+      - name: Build Release firmware
+        shell: bash
+        run: |
+          make -f "${{ steps.gen_makefile_2.outputs.makefile-path }}" -j$(nproc)
+
+      # Upload .elf and .hex as build artifacts
+      - name: Upload firmware artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: |
+            firmware/TriCore Release (GCC)/*.elf
+            firmware/TriCore Release (GCC)/*.hex
+
+      # Attach built files to the draft release if one exists
+      - name: Attach artifacts to draft release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+            const path = require("path");
+            const { owner, repo } = context.repo;
+
+            const releases = await github.rest.repos.listReleases({ owner, repo, per_page: 100 });
+            const draft = releases.data.find(r => r.draft);
+            if (!draft) {
+              console.log("No draft release found, skipping asset upload.");
+              return;
+            }
+
+            const buildDir = `${process.env.GITHUB_WORKSPACE}/firmware/TriCore Release (GCC)`;
+            const files = fs.readdirSync(buildDir).filter(f => f.endsWith(".elf") || f.endsWith(".hex"));
+
+            const suffix = "${{ matrix.artifact }}".replace("aurix-tc375-inav", "").replace(/^-/, "");
+
+            for (const file of files) {
+              const ext = path.extname(file);
+              const base = path.basename(file, ext);
+              const assetName = suffix ? `${base}-${suffix}${ext}` : `${base}${ext}`;
+              const filePath = path.join(buildDir, file);
+
+              // Delete existing asset with the same name to allow re-runs
+              const existing = draft.assets.find(a => a.name === assetName);
+              if (existing) {
+                await github.rest.repos.deleteReleaseAsset({ owner, repo, asset_id: existing.id });
+              }
+
+              await github.rest.repos.uploadReleaseAsset({
+                owner,
+                repo,
+                release_id: draft.id,
+                name: assetName,
+                data: fs.readFileSync(filePath),
+              });
+              console.log(`Uploaded ${assetName}`);
+            }
