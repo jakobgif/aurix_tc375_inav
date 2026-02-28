@@ -1,0 +1,93 @@
+name: Auto Generate Release Notes
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate-release-notes:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate release notes
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const head = context.sha;
+
+            // Find the latest draft release to update
+            const releases = await github.rest.repos.listReleases({
+              owner,
+              repo,
+              per_page: 100
+            });
+
+            const draftRelease = releases.data.find(r => r.draft);
+            if (!draftRelease) {
+              core.setFailed("No draft release found.");
+              return;
+            }
+
+            // Find the latest published release to use as base
+            const lastRelease = releases.data.find(r => !r.draft && !r.prerelease);
+            const base = lastRelease ? lastRelease.tag_name : null;
+
+            let commits = [];
+
+            if (base) {
+              const comparison = await github.rest.repos.compareCommits({
+                owner,
+                repo,
+                base,
+                head
+              });
+              commits = comparison.data.commits;
+            } else {
+              // No previous release: get all commits up to head
+              const list = await github.rest.repos.listCommits({
+                owner,
+                repo,
+                sha: head,
+                per_page: 100
+              });
+              commits = list.data;
+            }
+
+            const commitMessages = commits.map(c => {
+              const msg = c.commit.message.split("\n")[0];
+              const author = c.author ? `by @${c.author.login}` : `by ${c.commit.author.name}`;
+              return `- ${msg} ${author}`;
+            }).join("\n");
+
+            const compareLink = base ? `\n\n**Full Changelog**: https://github.com/${owner}/${repo}/compare/${base}...${head}` : "";
+
+            const generatedContent = (commitMessages || "No commits found since last release.") + compareLink;
+
+            const BEGIN_MARKER = "<!-- BEGIN_COMMITS -->";
+            const END_MARKER = "<!-- END_COMMITS -->";
+
+            const currentBody = draftRelease.body || "";
+
+            let newBody;
+            if (currentBody.includes(BEGIN_MARKER) && currentBody.includes(END_MARKER)) {
+              newBody = currentBody.replace(
+                new RegExp(`${BEGIN_MARKER}[\\s\\S]*?${END_MARKER}`),
+                `${BEGIN_MARKER}\n${generatedContent}\n${END_MARKER}`
+              );
+            } else {
+              newBody = currentBody
+                + (currentBody ? "\n\n" : "")
+                + `${BEGIN_MARKER}\n${generatedContent}\n${END_MARKER}`;
+            }
+
+            await github.rest.repos.updateRelease({
+              owner,
+              repo,
+              release_id: draftRelease.id,
+              body: newBody
+            });
