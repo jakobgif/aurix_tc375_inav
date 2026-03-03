@@ -224,7 +224,7 @@ To build the firmware with the Fault Insertion Unit (FIU) enabled, the compile t
 
 To add compile time defines, right-click the project folder and select **Properties**. Then navigate to **C/C++ Build → Settings → AURIX GCC Compiler → Preprocessor**. Add a new entry to define `USE_FIU`.
 
-For more information on what the FIU module does, see the [FIU README](inav_tc375/src/main/fiu/README.md).
+For more information on what the FIU module does, see the [FIU README](https://github.com/jakobgif/inav_tc375/blob/main/src/main/fiu/README.md).
 
 ## Build .zip release
 Note: It is not recomended to use this approach for development.
