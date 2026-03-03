@@ -15,6 +15,7 @@ It is also possible to build a release with pre generated settings and version s
   - [WSL Setup](#wsl-setup)
   - [Generate settings in the GCC output folder](#generate-settings-in-the-gcc-output-folder)
   - [Build and falshing the project](#build-and-falshing-the-project)
+    - [Flash pre-built firmware artifact](#flash-pre-built-firmware-artifact)
   - [Build target selection](#build-target-selection)
   - [Build multicore application](#build-multicore-application)
   - [Build with Fault Insertion Unit (FIU)](#build-with-fault-insertion-unit-fiu)
@@ -132,6 +133,64 @@ The **flash button** is the **orange circular symbol** in the IDE toolbar, as sh
 <div align="center">
 <img src="images\aurix_flash.png" alt="aurix_flash" width="600"/>
 </div> 
+
+### Flash pre-built firmware artifact
+
+As an alternative to the IDE flash button, the firmware can also be flashed using the AURIX Flasher command-line tool.
+This is useful when a pre-built firmware file is already available and the IDE does not need to be opened.
+
+**Getting the firmware file:**
+
+The `.elf` and `.hex` files are not included in the Git repository, but are automatically built by the CI pipeline and are available from two places:
+
+- **GitHub Releases** (permanent): GitHub → Releases → select version → Assets → `aurix_tc375_inav.elf` / `.hex`
+- **GitHub Actions Artifacts** (temporary, ~90 days): GitHub → Actions → latest successful run → Artifacts
+
+If the firmware was built locally using the IDE, the output files are located at:
+```
+<project-root>\TriCore Release (GCC)\aurix_tc375_inav.elf
+<project-root>\TriCore Release (GCC)\aurix_tc375_inav.hex
+```
+
+The firmware file can be located anywhere on the system (e.g. Downloads folder, Desktop, or the project build output folder).
+The absolute path to the file must be provided when running the flash tool.
+
+**Flashing the firmware:**
+
+Navigate to the AURIX Flasher tool directory and run the flash command with the absolute path to the firmware file:
+
+```bash
+cd "C:\Infineon\AURIX-Studio-<version>\tools\AurixFlasherSoftwareTool_<version>"
+```
+
+Standard flash — INAV configuration is preserved:
+```bash
+AURIXFlasher.exe -elf "<path-to-firmware-file>\aurix_tc375_inav.elf"
+```
+
+Full erase flash — INAV configuration is wiped:
+```bash
+AURIXFlasher.exe -elf "<path-to-firmware-file>\aurix_tc375_inav.elf" -erase all
+```
+
+The TC375 has two separate flash areas:
+- **Program Flash (PFLASH):** stores the firmware code
+- **Data Flash (DFLASH):** stores the persistent INAV configuration (PIDs, port assignments, mixer settings, etc.)
+
+| Erase option | Effect |
+|---|---|
+| `-erase on` (default) | Erases only the used PFLASH regions — DFLASH and INAV configuration are preserved |
+| `-erase all` | Erases all flash including DFLASH — board starts with factory defaults on next boot |
+
+Use `-erase all` when:
+- Doing a fresh install on a new or unknown board
+- Upgrading across major INAV versions where the configuration layout has changed (alternative to defining `AURIX_CLEAR_DFLASH_ON_SYSTEM_INIT` in `platform.h`)
+- The board behaves unexpectedly after flashing and a corrupted configuration is suspected
+
+Optional: add `-ver on` to verify the flash content after programming:
+```bash
+AURIXFlasher.exe -elf "<path-to-firmware-file>\aurix_tc375_inav.elf" -erase all -ver on
+```
 
 ## Build target selection
 Aurix Development Studio allows excluding folders from the build process.
