@@ -2,7 +2,6 @@ name: Build Aurix TC375 INAV Firmware
 
 on:
   push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -33,7 +32,7 @@ jobs:
       - name: Clone aurix_tc375_inav with submodules
         shell: bash
         run: |
-          git clone --recurse-submodules https://github.com/jakobgif/aurix_tc375_inav.git firmware
+          git clone --recurse-submodules --branch ${{ github.ref_name }} https://github.com/jakobgif/aurix_tc375_inav.git firmware
 
       # First makefile pass — parses .cproject before settings files exist
       - name: Generate Makefile (first pass)
@@ -121,8 +120,9 @@ jobs:
             firmware/TriCore Release (GCC)/*.elf
             firmware/TriCore Release (GCC)/*.hex
 
-      # Attach built files to the draft release if one exists
+      # Attach built files to the draft release if one exists (main branch only)
       - name: Attach artifacts to draft release
+        if: github.ref == 'refs/heads/main'
         uses: actions/github-script@v7
         with:
           script: |
