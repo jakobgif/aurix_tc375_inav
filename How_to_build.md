@@ -157,20 +157,22 @@ The absolute path to the file must be provided when running the flash tool.
 
 **Flashing the firmware:**
 
-Navigate to the AURIX Flasher tool directory and run the flash command with the absolute path to the firmware file:
+Open a terminal and navigate to the AURIX Flasher tool directory:
 
 ```bash
-cd "C:\Infineon\AURIX-Studio-<version>\tools\AurixFlasherSoftwareTool_<version>"
+cd C:\Infineon\AURIX-Studio-<version>\tools\AurixFlasherSoftwareTool_<version>
 ```
+
+Then run the flash command with the absolute path to the firmware file.
 
 Standard flash — INAV configuration is preserved:
 ```bash
-AURIXFlasher.exe -elf "<path-to-firmware-file>\aurix_tc375_inav.elf"
+.\AURIXFlasher.exe -elf "<path-to-firmware-file>\aurix_tc375_inav.elf"
 ```
 
 Full erase flash — INAV configuration is wiped:
 ```bash
-AURIXFlasher.exe -elf "<path-to-firmware-file>\aurix_tc375_inav.elf" -erase all
+.\AURIXFlasher.exe -elf "<path-to-firmware-file>\aurix_tc375_inav.elf" -erase all
 ```
 
 The TC375 has two separate flash areas:
@@ -189,7 +191,7 @@ Use `-erase all` when:
 
 Optional: add `-ver on` to verify the flash content after programming:
 ```bash
-AURIXFlasher.exe -elf "<path-to-firmware-file>\aurix_tc375_inav.elf" -erase all -ver on
+.\AURIXFlasher.exe -elf "<path-to-firmware-file>\aurix_tc375_inav.elf" -erase all -ver on
 ```
 
 ## Build target selection
