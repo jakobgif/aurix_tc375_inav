@@ -170,24 +170,30 @@ Standard flash — INAV configuration is preserved:
 .\AURIXFlasher.exe -elf "<path-to-firmware-file>\aurix_tc375_inav.elf"
 ```
 
-Full erase flash — INAV configuration is wiped:
+Full erase flash — replaces all firmware code, INAV configuration is preserved:
 ```bash
 .\AURIXFlasher.exe -elf "<path-to-firmware-file>\aurix_tc375_inav.elf" -erase all
 ```
 
 The TC375 has two separate flash areas:
 - **Program Flash (PFLASH):** stores the firmware code
-- **Data Flash (DFLASH):** stores the persistent INAV configuration (PIDs, port assignments, mixer settings, etc.)
+- **Data Flash (DFLASH):** stores the persistent INAV configuration (PIDs, port assignments, mixer settings, etc.) at address `0xAF000000` (EEPROM emulation area)
 
 | Erase option | Effect |
 |---|---|
-| `-erase on` (default) | Erases only the used PFLASH regions — DFLASH and INAV configuration are preserved |
-| `-erase all` | Erases all flash including DFLASH — board starts with factory defaults on next boot |
+| `-erase on` (default) | Erases only the used PFLASH regions — DFLASH EEPROM and INAV configuration are preserved |
+| `-erase all` | Erases all PFLASH sectors — **DFLASH EEPROM (`0xAF000000`) is not erased** because it is not part of the ELF file; INAV configuration survives |
+
+> **Note:** Neither erase option clears the INAV configuration (PIDs, calibration, port assignments, etc.) because this data lives in the DFLASH EEPROM area (`0xAF000000`) which is written at runtime and is not referenced in the ELF file.
+>
+> To fully reset the INAV configuration use one of the following methods:
+> - **CLI (recommended):** Connect with the INAV Configurator, open the **CLI** tab and run `defaults` — resets all settings to factory defaults immediately without reflashing
+> - **Firmware flag:** Define `AURIX_CLEAR_DFLASH_ON_SYSTEM_INIT` in `platform.h`, rebuild and flash — the firmware erases the DFLASH EEPROM on first boot; remove the define and flash again afterwards
+> - **Infineon MemTool** (advanced, only if the above options are not possible): MemTool can directly erase specific DFLASH sectors via GUI. **This tool is risky** — incorrect operations on the UCB (User Configuration Block) region can permanently brick the board. Stick to the CLI `defaults` command or the firmware flag unless you know exactly what you are doing.
 
 Use `-erase all` when:
 - Doing a fresh install on a new or unknown board
-- Upgrading across major INAV versions where the configuration layout has changed (alternative to defining `AURIX_CLEAR_DFLASH_ON_SYSTEM_INIT` in `platform.h`)
-- The board behaves unexpectedly after flashing and a corrupted configuration is suspected
+- The board does not boot or the firmware is corrupted
 
 Optional: add `-ver on` to verify the flash content after programming:
 ```bash
