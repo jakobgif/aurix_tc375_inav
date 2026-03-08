@@ -37,6 +37,7 @@
 
 #include "common/log.h"
 #include "config.h"
+#include "Bsp.h"
 
 extern IfxCpu_syncEvent g_cpuSyncEvent;
 extern IfxCpu_syncEvent g_inavInitComplete;
@@ -52,15 +53,16 @@ void core1_main(void)
     IfxScuWdt_disableCpuWatchdog(IfxScuWdt_getCpuWatchdogPassword());
     
     /* Wait for CPU sync event */
+    waitTime(IfxStm_getTicksFromMilliseconds(BSP_DEFAULT_TIMER, 5));
     IfxCpu_emitEvent(&g_cpuSyncEvent);
-    IfxCpu_waitEvent(&g_cpuSyncEvent, 1);
+    IfxCpu_waitEvent(&g_cpuSyncEvent, UINT32_MAX);
     
 #ifdef USE_AURIX_MULTICORE
     //wait until inav init is complete
     IfxCpu_emitEvent(&g_inavInitComplete);
     IfxCpu_waitEvent(&g_inavInitComplete, UINT32_MAX);
 
-    LOG_INFO(SYSTEM, "CPU1 is alive!");
+    LOG_INFO(SYSTEM, "CPU%d is alive!", IfxCpu_getCoreIndex());
     g_cpuIsUsed[IfxCpu_getCoreIndex()] = true;
 
     //change the ISR provider of the SPI bus to CPU1
