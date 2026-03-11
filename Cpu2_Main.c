@@ -28,6 +28,11 @@
 #include "IfxCpu.h"
 #include "IfxScuWdt.h"
 
+#include "platform.h"
+
+#include "drivers/time.h"
+#include "sensors/barometer.h"
+
 #include "common/log.h"
 #include "Bsp.h"
 
@@ -58,7 +63,10 @@ void core2_main(void)
     g_cpuIsUsed[IfxCpu_getCoreIndex()] = true;
 
     while(true){
-        
+        uint32_t delay = baroUpdate();
+        if (delay > 0) {
+            delayMicroseconds(delay);
+        }
     }
 #else
     while(1){}
