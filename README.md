@@ -16,6 +16,7 @@ Run `git clone --recurse-submodules "https://github.com/jakobgif/aurix_tc375_ina
       - [Debug build](#debug-build)
     - [Linker Script](#linker-script)
   - [Submodules](#submodules)
+    - [Updating the inav submodule](#updating-the-inav-submodule)
   - [VSCode](#vscode)
   - [Scripts](#scripts)
   
@@ -83,6 +84,22 @@ This project uses a ported version of the inav flight control software as a subm
 The submodules are also listed in [.gitmodules](.gitmodules).
 
 Please refer to the [inav readme](https://github.com/jakobgif/inav_tc375#readme) for more infos.
+
+### Updating the inav submodule
+
+When a new version of the `inav_tc375` submodule is released (see [inav_tc375/how_to_upgrade.md](inav_tc375/how_to_upgrade.md)), update the submodule reference in this project and create a new release:
+
+```bash
+cd inav_tc375
+git fetch origin
+git checkout <new-tag>        # e.g. 9.0.1-aurix
+cd ..
+git add inav_tc375
+git commit -m "updated inav_tc375 submodule to <new-tag>"
+git push origin main
+```
+
+Then create and push a new tag for this project and publish the release manually on GitHub under **Releases -> Draft a new release**.
 
 ## VSCode 
 If vscode is used the following `c_cpp_properties.json` can be used to configure the workspace.
