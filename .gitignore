@@ -87,3 +87,9 @@ temp/*
 
 # allow .settings/com.infineon.aurix.buildsystem.prefs
 !/.settings/com.infineon.aurix.buildsystem.prefs
+
+# Git Bash crash dumps
+*.stackdump
+
+# local winIDEA debugger workspace state
+winIDEA/
